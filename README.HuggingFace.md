@@ -175,3 +175,4 @@ Then visit:
 docker run -d -p 7860:7860 --name starfish-app -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf -v $(pwd)/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf starfish-app
 
 docker build -t starfish-app . 
+docker build --no-cache -t your-image-name:your-tag .
