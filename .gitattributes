@@ -1,1 +1,4 @@
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+web/public/* filter=lfs diff=lfs merge=lfs -text
 web/public/amplify-ui.css !text !filter !merge !diff
