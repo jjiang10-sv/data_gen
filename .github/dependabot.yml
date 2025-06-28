@@ -1,0 +1,6 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/" # root of the repo
+    schedule:
+      interval: "weekly"

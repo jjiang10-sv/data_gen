@@ -1,0 +1,118 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Development files
+.env*
+!.env.example
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Node.js
+web/node_modules/
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/.pnpm-debug.log*
+web/.next/
+web/out/
+web/dist/
+web/build/
+web/.vercel
+
+# Documentation
+*.md
+!README.md
+docs/
+docs_mintlify/
+vibe_coding/
+
+# Tests
+tests/
+*.test.js
+*.test.ts
+*.test.tsx
+.coverage
+htmlcov/
+pytest.ini
+.pytest_cache/
+
+# Data and outputs
+data_factory_output/
+db/
+*.db
+*.sqlite
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Logs
+*.log
+web/api/logs/
+
+# Docker files (except the main ones)
+.dockerignore*
+Dockerfile.*
+docker-compose*.yml
+
+# Development and internal files
+internal/
+examples/
+mcp_hackathon/
+prebuilt_template/
+scripts/
+htmlcov/
+
+# Poetry (we copy these explicitly)
+# poetry.lock - we need this
+# pyproject.toml - we need this 
