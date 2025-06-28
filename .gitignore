@@ -1,7 +1,6 @@
 # Adhoc stuff
 web/node_modules/
 web/.next/
-web/public/
 web/dist/
 web/build/
 web/out/
