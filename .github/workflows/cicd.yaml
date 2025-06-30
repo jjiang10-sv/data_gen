@@ -36,13 +36,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # Cache Docker layers for backend
-      # - name: Cache Docker layers - backend
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: /tmp/.buildx-cache-backend
-      #     key: ${{ runner.os }}-buildx-backend-${{ hashFiles('**/Dockerfile.backend', '**/pyproject.toml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-buildx-backend-
+      - name: Cache Docker layers - backend
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache-backend
+          key: ${{ runner.os }}-buildx-backend-${{ hashFiles('**/Dockerfile.backend', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-backend-
 
       # Build and push backend
       - name: Build and push Docker images - backend
@@ -51,7 +51,7 @@ jobs:
           platforms: linux/amd64
           no-cache: true
           context: .
-          dockerfile: Dockerfile.backend
+          file: Dockerfile.backend
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/starfish-backend:${{ github.ref_name }}
@@ -60,13 +60,13 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache-backend,mode=max
 
       # Cache Docker layers for frontend
-      # - name: Cache Docker layers - frontend
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: /tmp/.buildx-cache-frontend
-      #     key: ${{ runner.os }}-buildx-frontend-${{ hashFiles('**/Dockerfile.frontend', '**/package.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-buildx-frontend-
+      - name: Cache Docker layers - frontend
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache-frontend
+          key: ${{ runner.os }}-buildx-frontend-${{ hashFiles('**/Dockerfile.frontend', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-frontend-
 
       # Build and push frontend
       - name: Build and push Docker images - frontend
@@ -75,7 +75,7 @@ jobs:
           platforms: linux/amd64
           no-cache: true
           context: .
-          dockerfile: Dockerfile.frontend
+          file: Dockerfile.frontend
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/starfish-frontend:${{ github.ref_name }}
