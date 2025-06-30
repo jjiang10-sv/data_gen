@@ -1,0 +1,42 @@
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files only
+COPY web/package*.json ./
+
+# Install dependencies with cache cleanup
+RUN npm ci --legacy-peer-deps
+
+# Copy frontend code and build
+COPY  web/ ./
+
+RUN NODE_ENV=production npm run build
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install curl for health check
+#RUN apk add --no-cache curl
+
+# Copy built application from standalone output
+# COPY --from=builder /app/.next ./.next
+# COPY --from=builder /app/public ./public
+# COPY --from=builder /app/package.json ./package.json
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# Expose port 3000
+EXPOSE 3000
+
+# Set environment variables
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV NODE_ENV=production
+
+# Start the frontend
+CMD ["node", "server.js"] 

@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starfish-backend
+  namespace: starfish
+  labels:
+    app: starfish-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: starfish-backend
+  template:
+    metadata:
+      labels:
+        app: starfish-backend
+    spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
+      containers:
+      - name: backend
+        image: 19860314/starfish-backend:latest
+        ports:
+        - containerPort: 8002
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: starfish-secrets
+              key: google-api-key
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: starfish-secrets
+              key: openai-api-key
+        # Autopilot requirements
+        resources:
+          requests:
+            memory: "256Mi"  # Autopilot minimum
+            cpu: "250m"      # Autopilot minimum
+          limits:
+            memory: "512Mi"    # Reasonable limit
+            cpu: "500m"      # Reasonable limit
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8002
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: starfish-backend-service
+  namespace: starfish
+spec:
+  selector:
+    app: starfish-backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8002
+  type: ClusterIP 

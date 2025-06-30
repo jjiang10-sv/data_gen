@@ -45,15 +45,29 @@ jobs:
             ${{ runner.os }}-buildx-
 
       # Build and push Docker image to DockerHub and GHCR
-      - name: Build and push Docker images
+      - name: Build and push Docker images - backend
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64
           context: .
+          dockerfile: Dockerfile.backend
           push: true
           # Define dynamic tags based on branch name
           tags: |
-            synthetic-data-${{ github.ref_name }}:latest  
+            backend-${{ github.ref_name }}:latest  
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+      - name: Build and push Docker images - frontend
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/amd64
+          context: .
+          dockerfile: Dockerfile.frontend
+          push: true
+          # Define dynamic tags based on branch name
+          tags: |
+            frontend-${{ github.ref_name }}:latest  
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
 

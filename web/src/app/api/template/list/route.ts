@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 // The target backend server base URL, derived from environment variable or defaulted.
 // This should match the logic in your frontend's page.tsx for consistency.
 const TARGET_SERVER_BASE_URL = process.env.SERVER_BASE_URL || 'http://localhost:8002';
+console.log('=== Environment Debug ===');
+console.log('process.env.SERVER_BASE_URL:', process.env.SERVER_BASE_URL);
+console.log('TARGET_SERVER_BASE_URL:', TARGET_SERVER_BASE_URL);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('========================');
 
 export async function GET() {
   try {

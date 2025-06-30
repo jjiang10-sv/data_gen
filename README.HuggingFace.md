@@ -172,6 +172,250 @@ Then visit:
 - Consider making your Space private if it contains sensitive data
 - Regularly update dependencies for security patches 
 
+To **completely remove Git LFS** from your repo (i.e. make all files tracked by LFS become normal Git files again), follow this clean and safe step-by-step process:
+
+---
+
+## ✅ Step-by-Step: Remove Git LFS from a Git Repository
+
+### 🔁 1. **Install Git LFS (temporarily)**
+
+You need Git LFS installed to properly migrate tracked files back into Git:
+
+```bash
+git lfs install
+```
+
+---
+
+### 🧹 2. **Pull the real content from LFS**
+
+This ensures you have the actual files, not just LFS pointer files:
+
+```bash
+git lfs pull
+```
+
+---
+
+### 🧬 3. **Migrate all LFS files back into normal Git history**
+
+This rewrites Git history and replaces LFS pointers with actual file contents:
+
+```bash
+git lfs migrate export --everything
+```
+
+> This will scan all commits and convert LFS files into regular Git objects.
+
+---
+
+### 🚫 4. **Remove LFS tracking**
+
+#### A. Untrack specific files:
+
+```bash
+git lfs untrack "path/to/file.ext"
+```
+
+#### B. Or untrack all:
+
+Edit `.gitattributes` and delete all lines referencing `filter=lfs`.
+Then run:
+
+```bash
+git rm --cached .gitattributes
+```
+
+And re-add it if needed:
+
+```bash
+git add .gitattributes
+```
+
+---
+
+### 🚀 5. **Force push updated repo**
+
+Because you've rewritten history, you'll need to force push:
+
+```bash
+git add .
+git commit -m "Remove LFS and convert files to normal Git"
+git push --force
+```
+
+> ⚠️ Make sure collaborators know this is a **history rewrite**, and force pushes are involved.
+
+---
+
+### 🧹 6. (Optional) **Delete Git LFS objects from remote**
+
+GitHub (or other LFS providers) may keep the old LFS objects around, even if unused.
+
+To remove them:
+
+* Go to your GitHub repo → Settings → Git LFS → Delete files manually
+  OR
+* Use GitHub CLI / API to clean them up
+
+---
+
+### 📦 7. **Verify it's clean**
+
+* Check `.gitattributes` is clean (no `filter=lfs`)
+* Check LFS is no longer tracking anything:
+
+```bash
+git lfs ls-files
+```
+
+> Should return nothing.
+
+* Check your files are now regular Git blobs:
+
+```bash
+git show HEAD:path/to/your/file
+```
+
+---
+
+## ✅ Summary
+
+| Step                                  | Description                   |
+| ------------------------------------- | ----------------------------- |
+| `git lfs pull`                        | Download real content         |
+| `git lfs migrate export --everything` | Convert to normal Git objects |
+| Edit `.gitattributes`                 | Remove LFS tracking rules     |
+| `git push --force`                    | Rewrite history on remote     |
+| Confirm with `git lfs ls-files`       | Should be empty               |
+
+---
+
+Let me know if you’d like a one-liner for cleaning a small project or help safely backing it up before rewriting history.
+
+
+If `git lfs ls-files` **still lists** `web/public/amplify-ui.css` even **after you've run**:
+
+```bash
+git lfs migrate export --everything
+```
+
+...then either:
+
+1. The file is still **listed in `.gitattributes`** to be tracked by LFS, **or**
+2. Your working tree is clean, but Git history still includes it tracked as LFS.
+
+---
+
+## ✅ Let’s fix it completely — hard reset style
+
+### 🧨 1. Double-check and clean `.gitattributes`
+
+Open `.gitattributes` in the root of your repo. If it still contains:
+
+```
+web/public/amplify-ui.css filter=lfs ...
+```
+
+Then Git will still *retrack* the file in LFS.
+
+❌ Delete that line (or comment it out).
+✅ Then run:
+
+```bash
+git rm --cached .gitattributes
+git add .gitattributes
+```
+
+---
+
+### 🔁 2. Re-run the full LFS removal migration (to ensure all commits are scrubbed)
+
+Run this again to be safe:
+
+```bash
+git lfs migrate export --everything --include="web/public/amplify-ui.css"
+```
+
+> You can also just migrate the entire repo:
+
+```bash
+git lfs migrate export --everything
+```
+
+---
+
+### ✅ 3. Untrack the file from LFS explicitly
+
+```bash
+git lfs untrack "web/public/amplify-ui.css"
+git add .gitattributes
+```
+
+You can verify untracking worked:
+
+```bash
+git lfs track  # This should NOT list amplify-ui.css
+```
+
+---
+
+### 🧼 4. Clean up and re-add the file to Git
+
+```bash
+git rm --cached web/public/amplify-ui.css
+git add web/public/amplify-ui.css
+git commit -m "Fully remove amplify-ui.css from LFS"
+```
+
+---
+
+### 🚀 5. Push rewritten history
+
+Because you rewrote history, you need to **force-push**:
+
+```bash
+git push --force
+```
+
+---
+
+### 🧪 6. Confirm it's 100% clean
+
+```bash
+git lfs ls-files
+```
+
+✅ It should now return **nothing**
+
+---
+
+## 💡 Optional: Double-check the Git blob
+
+To make sure Git is storing the actual file (not a pointer):
+
+```bash
+git show HEAD:web/public/amplify-ui.css | head
+```
+
+If it's a **plain CSS file**, you're done.
+
+If it looks like:
+
+```
+version https://git-lfs.github.com/spec/v1
+oid sha256:...
+size 1234
+```
+
+→ That’s still a Git LFS pointer file → one of the steps above didn’t stick.
+
+---
+
+Let me know if you'd like to rewrite the whole repo cleanly and start fresh — or keep the full LFS-free version in a new branch.
+
+
 docker run -d -p 7860:7860 --name starfish-app -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf -v $(pwd)/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf starfish-app
 
 docker build -t starfish-app . 

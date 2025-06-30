@@ -1,0 +1,39 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+#RUN apk add --no-cache curl
+
+# Copy pyproject.toml and poetry.lock
+COPY pyproject.toml poetry.lock ./
+COPY README.md ./
+
+# Install Poetry and dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --only=main --no-root || pip install fastapi uvicorn python-dotenv pydantic
+
+# Copy starfish source code
+COPY src/ ./src/
+RUN chmod +x /app/src/
+
+# Copy backend API code
+COPY web/api/ ./web/api/
+
+# Create necessary directories
+RUN mkdir -p /app/web/api/logs
+
+# Install the starfish package in development mode
+RUN pip install -e .
+
+# Change working directory to web
+WORKDIR /app/web
+
+# Expose port 8002
+EXPOSE 8002
+
+
+# Start the backend
+CMD ["python", "-m", "api.main"] 

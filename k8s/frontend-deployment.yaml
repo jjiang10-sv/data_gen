@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starfish-frontend
+  namespace: starfish
+  labels:
+    app: starfish-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: starfish-frontend
+  template:
+    metadata:
+      labels:
+        app: starfish-frontend
+    spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
+      containers:
+      - name: frontend
+        image: 19860314/starfish-frontend:latest
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "3000"
+        - name: HOSTNAME
+          value: "0.0.0.0"
+        - name: NODE_ENV
+          value: "production"
+        - name: SERVER_BASE_URL
+          value: "http://starfish-backend-service"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 3000
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 3000
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: starfish-loadbalancer
+  namespace: starfish
+  annotations:
+    cloud.google.com/load-balancer-type: "External"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: starfish-frontend 

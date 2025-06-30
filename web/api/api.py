@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 
 
 # Import routers
-from .routers import template, dataset, project
+from .routers import template, dataset, project, health
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.normpath(os.path.join(current_dir, "..", ".."))  # Go up two levels from web/api/
@@ -44,8 +44,4 @@ app.add_middleware(
 app.include_router(template.router)
 app.include_router(dataset.router)
 app.include_router(project.router)
-
-
-# Helper function to get adalflow root path
-def get_adalflow_default_root_path():
-    return os.path.expanduser(os.path.join("~", ".adalflow"))
+app.include_router(health.router)
