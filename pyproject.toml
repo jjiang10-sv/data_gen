@@ -25,7 +25,7 @@ datasets = "3.6.0"
 psutil = ">=7.0.0,<8.0.0"
 nest_asyncio = "^1.6.0"
 docstring_parser = "^0.16.0"
-mcp = "^1.8.1"
+mcp = "^1.10.1"
 # Force cryptography >=44.0.1 due to transitive security vulnerability
 # See: https://openssl-library.org/news/secadv/20250211.txt
 cryptography = ">=44.0.1"
