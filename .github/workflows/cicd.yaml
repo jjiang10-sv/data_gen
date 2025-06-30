@@ -20,6 +20,19 @@ jobs:
         with:
           fetch-depth: 1
 
+      # Clean up disk space before building
+      - name: Clean up disk space
+        run: |
+          echo "Available disk space before cleanup:"
+          df -h
+          echo "Cleaning up Docker system..."
+          docker system prune -af --volumes || true
+          echo "Cleaning up temporary files..."
+          sudo rm -rf /tmp/* || true
+          sudo rm -rf /var/tmp/* || true
+          echo "Available disk space after cleanup:"
+          df -h
+
       # Set up QEMU for multi-platform Docker builds
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
