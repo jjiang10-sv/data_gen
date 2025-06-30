@@ -62,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64
-          no-cache: true
+          #no-cache: true
           context: .
           file: Dockerfile.backend
           push: true
@@ -86,7 +86,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           platforms: linux/amd64
-          no-cache: true
+          #no-cache: true
           context: .
           file: Dockerfile.frontend
           push: true

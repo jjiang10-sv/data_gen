@@ -1,48 +1,39 @@
-FROM python:3.11-alpine AS builder
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install only essential build dependencies
-RUN apk add --no-cache \
-    gcc \
-    musl-dev \
-    libffi-dev \
-    curl
+# Install system dependencies
+#RUN apk add --no-cache curl
 
-# Copy package files
+# Copy pyproject.toml and poetry.lock
 COPY pyproject.toml poetry.lock ./
+COPY README.md ./
 
-# Install dependencies
-RUN pip install --no-cache-dir poetry \
+# Install Poetry and dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir poetry \
     && poetry config virtualenvs.create false \
-    && poetry install --only=main --no-root --no-interaction
+    && poetry install --only=main --no-root || pip install fastapi uvicorn python-dotenv pydantic
 
-# Production stage
-FROM python:3.11-alpine
-
-WORKDIR /app
-
-# Install only runtime dependencies
-RUN apk add --no-cache curl
-
-# Copy installed packages from builder
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-
-# Copy application code
+# Copy starfish source code
 COPY src/ ./src/
+RUN chmod +x /app/src/
+
+# Copy backend API code
 COPY web/api/ ./web/api/
 
-# Set environment
-ENV PYTHONPATH=/app:/app/src
-ENV PYTHONUNBUFFERED=1
+# Create necessary directories
+RUN mkdir -p /app/web/api/logs
 
-# Expose port
+# Install the starfish package in development mode
+RUN pip install -e .
+
+# Change working directory to web
+WORKDIR /app/web
+
+# Expose port 8002
 EXPOSE 8002
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8002/health || exit 1
 
-# Start application
-CMD ["uvicorn", "web.api.main:app", "--host", "0.0.0.0", "--port", "8002"] 
+# Start the backend
+CMD ["python", "-m", "api.main"] 
